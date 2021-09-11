@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router(); // create a router object from express
 
 router.get('', (req,res)=>{
-    res.send("It's alive");
+    res.render("landing/welcome");
 })
 
 router.get('/about-us', (req,res)=>{
