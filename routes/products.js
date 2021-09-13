@@ -108,4 +108,29 @@ router.post('/:product_id/update', async function(req,res){
     })
 })
 
+router.get('/:product_id/delete', async function(req,res){
+    const product = await Product.where({
+        'id': req.params.product_id
+    }).fetch({
+        'required': true
+    });
+
+    res.render('products/delete', {
+        'product': product.toJSON()
+    })
+})
+
+router.post('/:product_id/delete', async function(req,res){
+    const product = await Product.where({
+        'id': req.params.product_id
+    }).fetch({
+        'required': true
+    })
+
+    // to delete a row from the table
+    // call the destroy function on an instance of the model
+    await product.destroy();
+    res.redirect('/products')
+})
+
 module.exports = router;
