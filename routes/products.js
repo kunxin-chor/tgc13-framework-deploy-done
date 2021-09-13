@@ -22,4 +22,35 @@ router.get('/create', function(req,res){
     })
 })
 
+router.post('/create', function(req,res){
+    const productForm = createProductForm();
+    // first arg of handle is the request
+    // second arg is the setting objects
+    productForm.handle(req, {
+        // the form parameter is the processed form
+        // from caolan-forms
+        "success": async function(form){
+            // form is submitted successfully with no issue
+            // so we can create a new product
+
+            // 1. create an instance of the Product model
+            // the Product model ==> a table (in this care, the products table)
+            // one instance of the Product model==> a row in the products table
+            let newProduct = new Product(); 
+            newProduct.set('name', form.data.name);
+            newProduct.set('cost', form.data.cost);
+            newProduct.set('description', form.data.description)
+            // save the new row to the databse
+            await newProduct.save();
+            res.send("Product created")
+        },
+        "empty": function(req) {
+            res.send("None of the fields are filled in")
+        },
+        "error": function(){
+            res.send("If there are errors in the form")
+        }
+    })
+})
+
 module.exports = router;
