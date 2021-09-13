@@ -42,7 +42,7 @@ router.post('/create', function(req,res){
             newProduct.set('description', form.data.description)
             // save the new row to the databse
             await newProduct.save();
-            res.send("Product created")
+            res.redirect('/products')
         },
         "empty": function(req) {
             res.send("None of the fields are filled in")
@@ -52,6 +52,33 @@ router.post('/create', function(req,res){
                 'form': form.toHTML(bootstrapField)
             })
         }
+    })
+})
+
+router.get('/:product_id/update', async function(req,res){
+    // fetch the details of the product that we want to edit
+    let productId = req.params.product_id;
+
+    // fetch the product details using the bookshelf orm
+    // use the Product model's where function
+    // first arg - an object of settings
+    // analgous to db.collection('products').find({'_id':SOMEID})
+    let product = await Product.where({
+        'id': productId
+    }).fetch({
+        required: true
+    })
+
+    // create the product form
+    let productForm = createProductForm();
+    // retrieve the value of the name column from the product
+    productForm.fields.name.value = product.get('name');
+    productForm.fields.cost.value = product.get('cost');
+    productForm.fields.description.value = product.get('description');
+
+    res.render('products/update',{
+        'form': productForm.toHTML(bootstrapField),
+        'product': product.toJSON()
     })
 })
 
