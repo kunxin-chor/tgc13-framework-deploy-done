@@ -4,6 +4,7 @@ const forms = require('forms');
 const fields = forms.fields;
 const validators = forms.validators;
 
+// attribute: https://github.com/caolan/forms
 var bootstrapField = function (name, object) {
     if (!Array.isArray(object.widget.classes)) { object.widget.classes = []; }
 
@@ -43,4 +44,4 @@ const createProductForm = function() {
     })
 }
 
-module.exports = { createProductForm}
+module.exports = { createProductForm, bootstrapField}

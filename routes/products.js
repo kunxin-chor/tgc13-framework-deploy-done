@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { createProductForm} = require('../forms')
+const { createProductForm, bootstrapField } = require('../forms')
 
 // import in the Product model from models/index.js
 const { Product } = require('../models');
@@ -15,9 +15,10 @@ router.get('/', async function(req,res){
 })
 
 router.get('/create', function(req,res){
+    // create an instance of the form
     const productForm = createProductForm();
     res.render('products/create', {
-        'form': productForm.toHTML()
+        'form': productForm.toHTML(bootstrapField)
     })
 })
 
