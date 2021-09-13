@@ -82,4 +82,30 @@ router.get('/:product_id/update', async function(req,res){
     })
 })
 
+router.post('/:product_id/update', async function(req,res){
+    // fetch the product that we want to  update
+    let product = await Product.where({
+        'id': req.params.product_id
+    }).fetch({
+        required: true
+    });
+
+    // process the form
+    const productForm = createProductForm();
+    productForm.handle(req, {
+        'success': async function(form) {
+            // form.data MUST HAVE EXACTLY THE SAME KEYS
+            // AS THE COLUMNS IN THE PRODUCTS TABLE
+            // with the exception of id
+            product.set(form.data);
+            // i.e
+            // product.set("name", form.data.name);
+            // product.set("cost", form.data.cost);
+            // product.set('description', form.data.description');
+            await product.save();
+            res.redirect('/products');
+        }
+    })
+})
+
 module.exports = router;
