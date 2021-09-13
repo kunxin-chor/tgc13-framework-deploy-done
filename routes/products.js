@@ -5,6 +5,16 @@ const { createProductForm, bootstrapField } = require('../forms')
 // import in the Product model from models/index.js
 const { Product } = require('../models');
 
+async function getProductById(productId) {
+    let product = await Product.where({
+        'id': productId
+    }).fetch({
+        'required': true
+    })
+
+    return product;
+}
+
 router.get('/', async function(req,res){
     // eqv. to "select * from products"
     // analogous to: db.collection('products').find({})
@@ -63,11 +73,12 @@ router.get('/:product_id/update', async function(req,res){
     // use the Product model's where function
     // first arg - an object of settings
     // analgous to db.collection('products').find({'_id':SOMEID})
-    let product = await Product.where({
+    const product = await Product.where({
         'id': productId
     }).fetch({
-        required: true
-    })
+        'required': true
+    });
+    // let product = await getProductById(req.params.product_id);
 
     // create the product form
     let productForm = createProductForm();
@@ -84,11 +95,12 @@ router.get('/:product_id/update', async function(req,res){
 
 router.post('/:product_id/update', async function(req,res){
     // fetch the product that we want to  update
-    let product = await Product.where({
-        'id': req.params.product_id
-    }).fetch({
-        required: true
-    });
+    // let product = await Product.where({
+    //     'id': req.params.product_id
+    // }).fetch({
+    //     required: true
+    // });
+    let product = await getProductById(req.params.product_id);
 
     // process the form
     const productForm = createProductForm();
