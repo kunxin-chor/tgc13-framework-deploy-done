@@ -47,8 +47,10 @@ router.post('/create', function(req,res){
         "empty": function(req) {
             res.send("None of the fields are filled in")
         },
-        "error": function(){
-            res.send("If there are errors in the form")
+        "error": function(form){
+            res.render('products/create',{
+                'form': form.toHTML(bootstrapField)
+            })
         }
     })
 })
