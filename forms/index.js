@@ -10,6 +10,14 @@ const createProductForm = function() {
         "name": fields.string({
             required: true,
             errorAfterField: true, 
+        }),
+        "cost": fields.string({
+            required: true,
+            errorAfterField: true
+        }),
+        "description": fields.string({
+            required: true,
+            errorAfterField: true
         })
     })
 }
