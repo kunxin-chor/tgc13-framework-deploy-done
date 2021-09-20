@@ -19,7 +19,7 @@ router.get('/', async function(req,res){
     // eqv. to "select * from products"
     // analogous to: db.collection('products').find({})
     let products = await Product.collection().fetch({
-        withRelated:['category'] // <-- indicate that we want to load in the category information for each product
+        withRelated:['category', 'tags'] // <-- indicate that we want to load in the category information for each product
     });
     res.render('products/index',{
         'products': products.toJSON()
@@ -100,7 +100,12 @@ router.get('/:product_id/update', async function(req,res){
     const allCategories = await Category.fetchAll().map(function(category){
         return [ category.get('id'), category.get('name')]
     })
-    
+
+    // get all the existing tags as an array
+    const allTags = await (await Tag.fetchAll()).map(function(tag){
+        return [ tag.get('id'), tag.get('name')]
+    })
+
     // fetch the details of the product that we want to edit
     let productId = req.params.product_id;
 
@@ -111,17 +116,22 @@ router.get('/:product_id/update', async function(req,res){
     const product = await Product.where({
         'id': productId
     }).fetch({
-        'required': true
+        'require': true,
+        'withRelated':['tags']
     });
     // let product = await getProductById(req.params.product_id);
 
     // create the product form
-    let productForm = createProductForm(allCategories);
+    let productForm = createProductForm(allCategories, allTags);
     // retrieve the value of the name column from the product
     productForm.fields.name.value = product.get('name');
     productForm.fields.cost.value = product.get('cost');
     productForm.fields.description.value = product.get('description');
     productForm.fields.category_id.value = product.get('category_id');
+
+    // fetch all the related tags of the product
+    let selectedTags = await product.related('tags').pluck('id');
+    productForm.fields.tags.value = selectedTags;
 
     res.render('products/update',{
         'form': productForm.toHTML(bootstrapField),
@@ -151,13 +161,42 @@ router.post('/:product_id/update', async function(req,res){
             // form.data MUST HAVE EXACTLY THE SAME KEYS
             // AS THE COLUMNS IN THE PRODUCTS TABLE
             // with the exception of id
-            product.set(form.data);
+            let {tags, ...productData} = form.data; // <-- extract out the tags key into the tags variable
+                                                    // and place the other remaining keys into an object named productData
+                                                    // for more info, consutl JavaScript Object Destructuring
+            // i.e, short form for:
+            // let tags = form.data.tags;
+            // let productData = {}
+            // productData.name = form.data.name
+            // productData.cost = form.data.cost
+            // productData.description = form.data.description
+            // productData.category_id = form.data.category_id
+            product.set(productData);
+            await product.save();
             // i.e
             // product.set("name", form.data.name);
             // product.set("cost", form.data.cost);
             // product.set('description', form.data.description');
             // product.set('category_id', form.data.category_id)
-            await product.save();
+
+
+            // update the relationship
+
+            // currently selected tags
+            let tagIds = tags.split(',')
+
+            // get all the tags that are selected first
+            let existingTagIds = await product.related('tags').pluck('id')
+
+            // remove all the tags that are not selected any more
+            let toRemove = existingTagIds.filter(function(id){
+                return tagIds.includes(id) === false
+            })
+
+            await product.tags().detach(toRemove);
+
+            // add in all the tags that are selected
+            await product.tags().attach(tagIds);      
             res.redirect('/products');
         }
     })
