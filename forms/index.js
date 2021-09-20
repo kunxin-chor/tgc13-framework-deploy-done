@@ -27,7 +27,7 @@ var bootstrapField = function (name, object) {
 };
 
 // the first argument will be an array of categories
-const createProductForm = function(categories) {
+const createProductForm = function(categories, tags) {
     return forms.create({
         // <input type="text" name="productName" etc. >
         "name": fields.string({
@@ -49,6 +49,12 @@ const createProductForm = function(categories) {
             errorAfterField: true,
             widget: widgets.select(), // indicate we want a <select></select> to fill in the field
             choices: categories
+        }),
+        "tags": fields.string({
+            required: true,
+            erorrAfterField: true,
+            widget: widgets.multipleSelect(),
+            choices: tags
         })
     })
 }

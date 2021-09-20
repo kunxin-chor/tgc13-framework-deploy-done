@@ -7,20 +7,31 @@ const bookshelf = require('../bookshelf');
 const Product = bookshelf.model('Product',{
     'tableName':'products',
     category() {
-        return this.belongsTo('Category')
+        return this.belongsTo('Category') // first argument must be the name of a model
+    },
+    tags(){
+        return this.belongsToMany('Tag')
     }
 })
 
 const Category = bookshelf.model('Category', {
     'tableName':'categories', // <-- the name of the table inside the MYSQL database
     products() {
-        return this.hasMany('Product')
+        return this.hasMany('Product') // first argument must be the name of a model
+    }
+})
+
+const Tag = bookshelf.model('Tag', {
+    'tableName': 'tags', // <-- the tags table in the database
+    products() {
+        return this.belongsToMany('Product')  // first argument must be the name of a Model
     }
 })
 
 module.exports = { 
     'Product': Product,
-    'Category': Category
+    'Category': Category,
+    'Tag': Tag
 }
 
 // short form

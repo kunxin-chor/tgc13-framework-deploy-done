@@ -2,8 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { createProductForm, bootstrapField } = require('../forms')
 
-// import in the Product model from models/index.js
-const { Product, Category } = require('../models');
+// import in the Product model, Category model and the Tag model from models/index.js
+const { Product, Category, Tag } = require('../models');
 
 async function getProductById(productId) {
     let product = await Product.where({
@@ -31,16 +31,30 @@ router.get('/create', async function(req,res){
     const allCategories = await Category.fetchAll().map(function(category){
         return [ category.get('id'), category.get('name')]
     })
+
+    // retrieve an array of all the tags
+    const allTags = await (await Tag.fetchAll()).map(function(tag){
+        return [ tag.get('id'), tag.get('name')]
+    })
    
     // create an instance of the form
-    const productForm = createProductForm(allCategories);
+    const productForm = createProductForm(allCategories, allTags);
     res.render('products/create', {
         'form': productForm.toHTML(bootstrapField)
     })
 })
 
-router.post('/create', function(req,res){
-    const productForm = createProductForm();
+router.post('/create', async function(req,res){
+
+    const allCategories = await Category.fetchAll().map(function(category){
+        return [ category.get('id'), category.get('name')]
+    })
+
+    const allTags = await (await Tag.fetchAll()).map(function(tag){
+        return [ tag.get('id'), tag.get('name')]
+    })
+
+    const productForm = createProductForm(allCategories, allTags);
     // first arg of handle is the request
     // second arg is the setting objects
     productForm.handle(req, {
@@ -58,8 +72,16 @@ router.post('/create', function(req,res){
             newProduct.set('cost', form.data.cost);
             newProduct.set('description', form.data.description)
             newProduct.set('category_id', form.data.category_id)
+            // check if the user select any tags
+        
             // save the new row to the databse
             await newProduct.save();
+
+            // can only save the relationship after the product is created
+            if (form.data.tags) {  
+                // example of form.data.tags is '1,2' where 1 and 2 is the id of the tag
+                await newProduct.tags().attach(form.data.tags.split(','))
+            }
             res.redirect('/products')
         },
         "empty": function(req) {
