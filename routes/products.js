@@ -3,13 +3,13 @@ const router = express.Router();
 const { createProductForm, bootstrapField } = require('../forms')
 
 // import in the Product model from models/index.js
-const { Product } = require('../models');
+const { Product, Category } = require('../models');
 
 async function getProductById(productId) {
     let product = await Product.where({
         'id': productId
     }).fetch({
-        'required': true
+        'require': true
     })
 
     return product;
@@ -18,15 +18,22 @@ async function getProductById(productId) {
 router.get('/', async function(req,res){
     // eqv. to "select * from products"
     // analogous to: db.collection('products').find({})
-    let products = await Product.collection().fetch();
+    let products = await Product.collection().fetch({
+        withRelated:['category'] // <-- indicate that we want to load in the category information for each product
+    });
     res.render('products/index',{
         'products': products.toJSON()
     })
 })
 
-router.get('/create', function(req,res){
+router.get('/create', async function(req,res){
+    // retrieve an array of all available categories
+    const allCategories = await Category.fetchAll().map(function(category){
+        return [ category.get('id'), category.get('name')]
+    })
+   
     // create an instance of the form
-    const productForm = createProductForm();
+    const productForm = createProductForm(allCategories);
     res.render('products/create', {
         'form': productForm.toHTML(bootstrapField)
     })
@@ -50,6 +57,7 @@ router.post('/create', function(req,res){
             newProduct.set('name', form.data.name);
             newProduct.set('cost', form.data.cost);
             newProduct.set('description', form.data.description)
+            newProduct.set('category_id', form.data.category_id)
             // save the new row to the databse
             await newProduct.save();
             res.redirect('/products')
@@ -66,6 +74,11 @@ router.post('/create', function(req,res){
 })
 
 router.get('/:product_id/update', async function(req,res){
+    // retrieve an array of all available categories
+    const allCategories = await Category.fetchAll().map(function(category){
+        return [ category.get('id'), category.get('name')]
+    })
+    
     // fetch the details of the product that we want to edit
     let productId = req.params.product_id;
 
@@ -81,11 +94,12 @@ router.get('/:product_id/update', async function(req,res){
     // let product = await getProductById(req.params.product_id);
 
     // create the product form
-    let productForm = createProductForm();
+    let productForm = createProductForm(allCategories);
     // retrieve the value of the name column from the product
     productForm.fields.name.value = product.get('name');
     productForm.fields.cost.value = product.get('cost');
     productForm.fields.description.value = product.get('description');
+    productForm.fields.category_id.value = product.get('category_id');
 
     res.render('products/update',{
         'form': productForm.toHTML(bootstrapField),
@@ -94,6 +108,12 @@ router.get('/:product_id/update', async function(req,res){
 })
 
 router.post('/:product_id/update', async function(req,res){
+  
+    // retrieve an array of all available categories
+    const allCategories = await Category.fetchAll().map(function(category){
+        return [ category.get('id'), category.get('name')]
+    })
+
     // fetch the product that we want to  update
     // let product = await Product.where({
     //     'id': req.params.product_id
@@ -103,7 +123,7 @@ router.post('/:product_id/update', async function(req,res){
     let product = await getProductById(req.params.product_id);
 
     // process the form
-    const productForm = createProductForm();
+    const productForm = createProductForm(allCategories);
     productForm.handle(req, {
         'success': async function(form) {
             // form.data MUST HAVE EXACTLY THE SAME KEYS
@@ -114,6 +134,7 @@ router.post('/:product_id/update', async function(req,res){
             // product.set("name", form.data.name);
             // product.set("cost", form.data.cost);
             // product.set('description', form.data.description');
+            // product.set('category_id', form.data.category_id)
             await product.save();
             res.redirect('/products');
         }

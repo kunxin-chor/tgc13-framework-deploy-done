@@ -3,6 +3,7 @@ const forms = require('forms');
 // create some shortcuts
 const fields = forms.fields;
 const validators = forms.validators;
+const widgets = forms.widgets;
 
 // attribute: https://github.com/caolan/forms
 var bootstrapField = function (name, object) {
@@ -25,8 +26,8 @@ var bootstrapField = function (name, object) {
     return '<div class="form-group">' + label + widget + error + '</div>';
 };
 
-
-const createProductForm = function() {
+// the first argument will be an array of categories
+const createProductForm = function(categories) {
     return forms.create({
         // <input type="text" name="productName" etc. >
         "name": fields.string({
@@ -41,6 +42,13 @@ const createProductForm = function() {
         "description": fields.string({
             required: true,
             errorAfterField: true
+        }),
+        "category_id": fields.string({
+            label:'Category',
+            required: true,
+            errorAfterField: true,
+            widget: widgets.select(), // indicate we want a <select></select> to fill in the field
+            choices: categories
         })
     })
 }
