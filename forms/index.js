@@ -7,7 +7,9 @@ const widgets = forms.widgets;
 
 // attribute: https://github.com/caolan/forms
 var bootstrapField = function (name, object) {
-    if (!Array.isArray(object.widget.classes)) { object.widget.classes = []; }
+    if (!Array.isArray(object.widget.classes)) {
+        object.widget.classes = [];
+    }
 
     if (object.widget.classes.indexOf('form-control') === -1) {
         object.widget.classes.push('form-control');
@@ -27,24 +29,24 @@ var bootstrapField = function (name, object) {
 };
 
 // the first argument will be an array of categories
-const createProductForm = function(categories, tags) {
+const createProductForm = function (categories, tags) {
     return forms.create({
         // <input type="text" name="productName" etc. >
         "name": fields.string({
             required: true,
-            errorAfterField: true, 
+            errorAfterField: true,
         }),
         "cost": fields.string({
             required: true,
             errorAfterField: true,
-            validators:[validators.integer(), validators.min(0)]
+            validators: [validators.integer(), validators.min(0)]
         }),
         "description": fields.string({
             required: true,
             errorAfterField: true
         }),
         "category_id": fields.string({
-            label:'Category',
+            label: 'Category',
             required: true,
             errorAfterField: true,
             widget: widgets.select(), // indicate we want a <select></select> to fill in the field
@@ -64,7 +66,7 @@ const createRegistrationForm = () => {
     return forms.create({
         'username': fields.string({
             'required': true,
-            'errorAfterField': true,            
+            'errorAfterField': true,
         }),
         'email': fields.string({
             'required': true,
@@ -79,9 +81,28 @@ const createRegistrationForm = () => {
             'required': true,
             'errorAfterField': true,
             'widget': widgets.password(),
-            'validators':[ validators.matchField('password')]
+            'validators': [validators.matchField('password')]
         })
     })
 }
 
-module.exports = { createProductForm, createRegistrationForm, bootstrapField}
+const createLoginForm = () => {
+    return forms.create({
+        'email': fields.string({
+            'required': true,
+            'errorAfterField': true
+        }),
+        'password': fields.string({
+            'required': true,
+            'errorAfterField': true,
+            'widget': widgets.password()
+        })
+    })
+}
+
+module.exports = {
+    createProductForm,
+    createRegistrationForm,
+    bootstrapField,
+    createLoginForm
+}
