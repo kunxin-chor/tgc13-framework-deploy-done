@@ -72,11 +72,13 @@ const createRegistrationForm = () => {
         }),
         'password': fields.string({
             'required': true,
-            'errorAfterField': true
+            'errorAfterField': true,
+            'widget': widgets.password()
         }),
         'confirm_password': fields.string({
             'required': true,
             'errorAfterField': true,
+            'widget': widgets.password(),
             'validators':[ validators.matchField('password')]
         })
     })
