@@ -98,6 +98,12 @@ router.post('/login', (req, res) => {
 })
 
 
+router.get('/logout', (req,res)=>{
+    req.session.user = null;
+    req.flash('success_messages', 'You have logged out of your account');
+    res.redirect('/users/login')
+})
+
 // profile page
 router.get('/profile', (req,res)=>{
     // once an object has been saved to session, we can retrieve it
@@ -106,7 +112,7 @@ router.get('/profile', (req,res)=>{
 
     if (!user) {
         req.flash('error_messages', "You do not have permission to access this page");
-        req.redirect('/users/login')
+        res.redirect('/users/login')
     }
 
     res.render('users/profile',{
