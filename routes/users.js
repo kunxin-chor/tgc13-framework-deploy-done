@@ -27,6 +27,7 @@ router.post('/register', (req,res)=>{
             })
             await user.save();
             req.flash("success_messages", "Registration completed. You may log in now.")        
+            res.redirect('/users/register')
         },
         'error': (form) => {
             res.render('/users/register', {
