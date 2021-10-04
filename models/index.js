@@ -28,10 +28,15 @@ const Tag = bookshelf.model('Tag', {
     }
 })
 
+const User = bookshelf.model('User', {
+    'tableName': 'users'
+})
+
 module.exports = { 
     'Product': Product,
     'Category': Category,
-    'Tag': Tag
+    'Tag': Tag,
+    'User': User
 }
 
 // short form
