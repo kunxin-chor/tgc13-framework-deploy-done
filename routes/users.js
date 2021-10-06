@@ -114,7 +114,8 @@ router.get('/logout', (req,res)=>{
     res.redirect('/users/login')
 })
 
-// profile page
+// profile page is protected
+// only logged in users can see the profile page
 router.get('/profile', (req,res)=>{
     // once an object has been saved to session, we can retrieve it
     // just by `req.session.<key`
@@ -122,7 +123,7 @@ router.get('/profile', (req,res)=>{
 
     if (!user) {
         req.flash('error_messages', "You do not have permission to access this page");
-        res.redirect('/users/login')
+        return res.redirect('/users/login')
     }
 
     res.render('users/profile',{

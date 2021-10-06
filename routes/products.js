@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { createProductForm, bootstrapField } = require('../forms')
+const { createProductForm, bootstrapField } = require('../forms');
+const { checkIfAuthenticated } = require('../middlewares');
 
 // import in the Product model, Category model and the Tag model from models/index.js
 const { Product, Category, Tag } = require('../models');
@@ -26,7 +27,7 @@ router.get('/', async function(req,res){
     })
 })
 
-router.get('/create', async function(req,res){
+router.get('/create', checkIfAuthenticated, async function(req,res){
     // retrieve an array of all available categories
     const allCategories = await Category.fetchAll().map(function(category){
         return [ category.get('id'), category.get('name')]
@@ -44,7 +45,7 @@ router.get('/create', async function(req,res){
     })
 })
 
-router.post('/create', async function(req,res){
+router.post('/create', checkIfAuthenticated, async function(req,res){
 
     const allCategories = await Category.fetchAll().map(function(category){
         return [ category.get('id'), category.get('name')]
