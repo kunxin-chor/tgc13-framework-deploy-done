@@ -46,6 +46,13 @@ app.use(function(req,res,next){
     next();
 })
 
+// share the user data with all hbs files
+app.use(function(req,res,next){
+    res.locals.user = req.session.user;
+    next(); // call the next middleware, or the route
+            // if no middleware left
+})
+
 const landingRoutes = require('./routes/landing')
 const productRoutes = require('./routes/products')
 const userRoutes = require('./routes/users')

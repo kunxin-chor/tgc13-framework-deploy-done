@@ -12,6 +12,33 @@
   </head>
   <body>
     <div class="container-fluid">
+      <nav class="navbar navbar-expand-sm navbar-light bg-light">
+      <div class="container-fluid">
+          <a class="navbar-brand" href="javascript:void(0)">Logo</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mynavbar">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="/products">Products</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/products/create">Add Product</a>
+            </li>         
+          </ul>
+          <div class="d-flex">
+            {{#if user}}
+            <div>Hi, {{user.username}}  ({{user.email}})</div>
+            <a href="/users/logout" class="btn btn-primary btn-sm">Logout</a>
+            {{else}}
+            <div>Welcome, guest</div>
+            <a href="/users/login" class="btn btn-primary btn-sm">Log In</a>
+            {{/if}}
+          </div
+        </div>
+    </div>
+  </nav>
         {{#if success_messages}}
           {{#each success_messages}}
             <div class="alert alert-success">
