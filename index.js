@@ -3,7 +3,8 @@ const hbs = require('hbs')
 const wax = require('wax-on') // for {{#extends}} {{#block}}
 require('dotenv').config();
 const session = require('express-session');
-const flash = require('connect-flash')
+const flash = require('connect-flash');
+const FileStore = require('session-file-store')(session);
 
 // Create an express application
 let app = express(); 
@@ -26,6 +27,7 @@ app.use(express.urlencoded({
 
 // setup sessions
 app.use(session({
+    'store': new FileStore(),
     'secret': 'keyboard cat',
     'resave': false,
     'saveUninitialized': true
