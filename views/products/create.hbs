@@ -4,6 +4,7 @@
 <h1>Create new product</h1>
 <form method="POST">
     {{{form}}}
+    <input type="hidden" name="_csrf" value="{{csrfToken}}"/>
     <input type="submit" class="my-3 btn btn-primary"/>
 </form>
 {{/block}}

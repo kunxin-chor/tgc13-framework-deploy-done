@@ -5,6 +5,7 @@ require('dotenv').config();
 const session = require('express-session');
 const flash = require('connect-flash');
 const FileStore = require('session-file-store')(session);
+const csrf = require('csurf');
 
 // Create an express application
 let app = express(); 
@@ -43,6 +44,15 @@ app.use(function(req,res,next){
     // they will be assigned the values of the flashed messages 'success_messages' and 'error_messages'
     res.locals.success_messages = req.flash('success_messages');
     res.locals.error_messages = req.flash('error_messages')
+    next();
+})
+
+// enable protection from cross site request forgery
+app.use(csrf());
+
+// middleware to inject the csrf token into all hbs files
+app.use(function(req, res, next){
+    res.locals.csrfToken = req.csrfToken();
     next();
 })
 
