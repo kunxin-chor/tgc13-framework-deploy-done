@@ -41,7 +41,10 @@ router.get('/create', checkIfAuthenticated, async function(req,res){
     // create an instance of the form
     const productForm = createProductForm(allCategories, allTags);
     res.render('products/create', {
-        'form': productForm.toHTML(bootstrapField)
+        'form': productForm.toHTML(bootstrapField),
+        'cloudinaryName': process.env.CLOUDINARY_NAME,
+        'cloudinaryApiKey': process.env.CLOUDINARY_API_KEY,
+        'cloudinaryPreset': process.env.CLOUDINARY_UPLOAD_PRESET
     })
 })
 
@@ -73,6 +76,7 @@ router.post('/create', checkIfAuthenticated, async function(req,res){
             newProduct.set('cost', form.data.cost);
             newProduct.set('description', form.data.description)
             newProduct.set('category_id', form.data.category_id)
+            newProduct.set('image_url', form.data.image_url)
             // check if the user select any tags
         
             // save the new row to the databse
@@ -134,6 +138,7 @@ router.get('/:product_id/update', async function(req,res){
     productForm.fields.cost.value = product.get('cost');
     productForm.fields.description.value = product.get('description');
     productForm.fields.category_id.value = product.get('category_id');
+    productForm.fields.image_url.value = product.get('image_url');
 
     // fetch all the related tags of the product
     let selectedTags = await product.related('tags').pluck('id');
@@ -141,7 +146,10 @@ router.get('/:product_id/update', async function(req,res){
 
     res.render('products/update',{
         'form': productForm.toHTML(bootstrapField),
-        'product': product.toJSON()
+        'product': product.toJSON(),
+        'cloudinaryName': process.env.CLOUDINARY_NAME,
+        'cloudinaryApiKey': process.env.CLOUDINARY_API_KEY,
+        'cloudinaryPreset': process.env.CLOUDINARY_UPLOAD_PRESET
     })
 })
 
@@ -177,6 +185,7 @@ router.post('/:product_id/update', async function(req,res){
             // productData.cost = form.data.cost
             // productData.description = form.data.description
             // productData.category_id = form.data.category_id
+            // productData.image_url = form.data.image_url
             product.set(productData);
             await product.save();
             // i.e
