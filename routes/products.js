@@ -16,16 +16,13 @@ const {
     Tag
 } = require('../models');
 
-async function getProductById(productId) {
-    let product = await Product.where({
-        'id': productId
-    }).fetch({
-        'require': true,
-        'withRelated':['tags', 'categories']
-    })
-
-    return product;
-}
+// import from DAL the repository functions
+// repository in this context does not refer to github
+// rather it's a generic term to refer to a function
+// that retrives data from the database
+const {
+    getProductById, getAllCategories, getAllTags
+} = require('../dal/product.js')
 
 // router.get('/', async function(req,res){
 //     // eqv. to "select * from products"
@@ -48,9 +45,7 @@ router.get('/', async function (req, res) {
     allCategories.unshift([0, '----'])
 
     // retrieve an array of all the tags
-    const allTags = await (await Tag.fetchAll()).map(function (tag) {
-        return [tag.get('id'), tag.get('name')]
-    })
+    const allTags = await getAllTags();
 
     let searchForm = createSearchForm(allCategories, allTags);
 
@@ -112,14 +107,10 @@ router.get('/', async function (req, res) {
 
 router.get('/create', checkIfAuthenticated, async function (req, res) {
     // retrieve an array of all available categories
-    const allCategories = await Category.fetchAll().map(function (category) {
-        return [category.get('id'), category.get('name')]
-    })
-
+    const allCategories = await getAllCategories();
+    
     // retrieve an array of all the tags
-    const allTags = await (await Tag.fetchAll()).map(function (tag) {
-        return [tag.get('id'), tag.get('name')]
-    })
+    const allTags = await getAllTags();
 
     // create an instance of the form
     const productForm = createProductForm(allCategories, allTags);
@@ -133,13 +124,8 @@ router.get('/create', checkIfAuthenticated, async function (req, res) {
 
 router.post('/create', checkIfAuthenticated, async function (req, res) {
 
-    const allCategories = await Category.fetchAll().map(function (category) {
-        return [category.get('id'), category.get('name')]
-    })
-
-    const allTags = await (await Tag.fetchAll()).map(function (tag) {
-        return [tag.get('id'), tag.get('name')]
-    })
+    const allCategories = await getAllCategories();
+    const allTags = await getAllTags();
 
     const productForm = createProductForm(allCategories, allTags);
     // first arg of handle is the request
@@ -190,14 +176,9 @@ router.post('/create', checkIfAuthenticated, async function (req, res) {
 
 router.get('/:product_id/update', async function (req, res) {
     // retrieve an array of all available categories
-    const allCategories = await Category.fetchAll().map(function (category) {
-        return [category.get('id'), category.get('name')]
-    })
-
+    const allCategories = await getAllCategories();
     // get all the existing tags as an array
-    const allTags = await (await Tag.fetchAll()).map(function (tag) {
-        return [tag.get('id'), tag.get('name')]
-    })
+    const allTags = await getAllTags();
 
     // fetch the details of the product that we want to edit
     let productId = req.params.product_id;
@@ -241,10 +222,7 @@ router.get('/:product_id/update', async function (req, res) {
 router.post('/:product_id/update', async function (req, res) {
 
     // retrieve an array of all available categories
-    const allCategories = await Category.fetchAll().map(function (category) {
-        return [category.get('id'), category.get('name')]
-    })
-
+    const allCategories = await getAllCategories();
     // fetch the product that we want to  update
     // let product = await Product.where({
     //     'id': req.params.product_id
@@ -306,11 +284,7 @@ router.post('/:product_id/update', async function (req, res) {
 })
 
 router.get('/:product_id/delete', async function (req, res) {
-    const product = await Product.where({
-        'id': req.params.product_id
-    }).fetch({
-        'required': true
-    });
+    const product = await getProductById(req.params.product_id)
 
     res.render('products/delete', {
         'product': product.toJSON()
@@ -318,11 +292,7 @@ router.get('/:product_id/delete', async function (req, res) {
 })
 
 router.post('/:product_id/delete', async function (req, res) {
-    const product = await Product.where({
-        'id': req.params.product_id
-    }).fetch({
-        'required': true
-    })
+    const product = await getProductById(req.params.product_id);
 
     // to delete a row from the table
     // call the destroy function on an instance of the model
