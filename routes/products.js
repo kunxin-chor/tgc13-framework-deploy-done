@@ -20,7 +20,8 @@ async function getProductById(productId) {
     let product = await Product.where({
         'id': productId
     }).fetch({
-        'require': true
+        'require': true,
+        'withRelated':['tags', 'categories']
     })
 
     return product;
@@ -205,12 +206,14 @@ router.get('/:product_id/update', async function (req, res) {
     // use the Product model's where function
     // first arg - an object of settings
     // analgous to db.collection('products').find({'_id':SOMEID})
-    const product = await Product.where({
-        'id': productId
-    }).fetch({
-        'require': true,
-        'withRelated': ['tags']
-    });
+    // const product = await Product.where({
+    //     'id': productId
+    // }).fetch({
+    //     'require': true,
+    //     'withRelated': ['tags']
+    // });
+
+    const product = await getProductById(productId);
     // let product = await getProductById(req.params.product_id);
 
     // create the product form
