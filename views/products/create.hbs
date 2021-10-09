@@ -42,7 +42,7 @@
 
     let afterUpload = (error, result) => {
         if (!error && result && result.event == 'success') {
-            //console.log(result)
+           //console.log(result)
             document.querySelector('#uploaded_image').src = result.info.secure_url;
             document.querySelector('#uploaded_image').style.display = "inline";
 
