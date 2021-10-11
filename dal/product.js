@@ -29,9 +29,15 @@ async function getAllTags() {
     return allTags;
 }
 
+// get all the products
+async function getAllProducts() {
+    return await Product.fetchAll();
+}
+
 module.exports = {
     getProductById,
     getAllCategories,
-    getAllTags
+    getAllTags,
+    getAllProducts
 }
 
