@@ -6,6 +6,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const FileStore = require('session-file-store')(session);
 const csrf = require('csurf');
+const bodyParser = require('body-parser'); // needed to extract information from Stripe sends a request to our webhook
 
 // Create an express application
 let app = express(); 
@@ -48,11 +49,23 @@ app.use(function(req,res,next){
 })
 
 // enable protection from cross site request forgery
-app.use(csrf());
+// app.use(csrf());
+const csurfInstance = csrf();
+app.use(function(req,res,next){
+    if (req.url == "/checkout/process_payment") {
+        return next();
+    } else {
+        // manually called the csurfInstance to 
+        // check the request
+        csurfInstance(req,res,next)
+    }
+})
 
 // middleware to inject the csrf token into all hbs files
 app.use(function(req, res, next){
-    res.locals.csrfToken = req.csrfToken();
+    if (req.csrfToken) {
+        res.locals.csrfToken = req.csrfToken();
+    }    
     next();
 })
 
