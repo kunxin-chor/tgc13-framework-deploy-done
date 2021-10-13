@@ -69,6 +69,7 @@ router.get('/cancelled', function(req,res){
     res.render('checkout/cancelled')
 })
 
+// webhook which Stripe will call to process the payment
 router.post('/process_payment', bodyParser.raw({"type":"application/json"}), function(req,res){
     // req contains data send to this endpoint from Stripe
     // and is only sent when Stripe completes a payment
